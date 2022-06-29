@@ -40,5 +40,6 @@ int main(int argv, char** argc){
         show_results(thresh, img1, img2);
     }
 
+    response_matching_quality(10, img1, img2);
     return 0;
 }
