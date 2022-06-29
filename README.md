@@ -34,15 +34,18 @@ threshold change and in for hamming distance l1 below 64 and out for over 64.
 - match_imgs_response  
 20 pts for each response and 10% of responses
 
+<img width="100%" src="https://user-images.githubusercontent.com/99626367/176428653-4b27c591-5ba9-4cdc-a887-8aeed04069d5.png"/>
 
-![picture 8](../images/2402bdf223327541310bb98950533b65993b0c2952113268252294bf84e1d680.png)  
 response 20~30 0 10% of matching pts
 
-![picture 9](../images/f8d8645632d93d27ab3a688579a35b999c60469849f6f92e1146a6d4927bc718.png)  
+<img width="100%" src="https://user-images.githubusercontent.com/99626367/176428664-8bac77ee-8f79-4270-ab94-d49560a2b836.png"/>
+
 response 30~40 - 10% of matching pts.
 
-![picture 6](../images/6212b8f6e994f38f0c7d7fe73c16726e5ac88341d7299204a7034285dd946696.png)  
+<img width="100%" src="https://user-images.githubusercontent.com/99626367/176428754-7faf6441-b9b5-4d9c-bff5-231cbcb99bc0.png"/>
+
 threshold: 30, matchings with small hamming distance
 
- ![picture 7](../images/94269f3a728646a0f6b547f7e1171c23c1f23c2a9ad1865fc62bf7cb843f3405.png)  
+<img width="100%" src="https://user-images.githubusercontent.com/99626367/176428763-5b10eee8-2e18-4b05-98eb-d8557c6e9396.png"/>
+
 threshold: 30, matchings with large hamming distance
