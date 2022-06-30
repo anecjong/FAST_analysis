@@ -72,3 +72,4 @@ public:
 
 void show_results(int thresh, cv::Mat img1_gray, cv::Mat img2_gray);
 void response_matching_quality(int thresh, cv::Mat img1, cv::Mat img2);
+std::vector<int> random_idx(int size, int total_size);

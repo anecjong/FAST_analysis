@@ -284,19 +284,23 @@ void response_matching_quality(int thresh, cv::Mat img1, cv::Mat img2){
     kp1 = img_fast.get_kp1();
     kp2 = img_fast.get_kp2();
 
-    std::vector<std::vector<cv::KeyPoint>> kp1_r {std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{}};
-    std::vector<std::vector<cv::KeyPoint>> kp2_r {std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{}};
+    std::vector<std::vector<cv::KeyPoint>> kp1_r {std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{}};
+    std::vector<std::vector<cv::KeyPoint>> kp2_r {std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{},std::vector<cv::KeyPoint>{}};
     for (auto& kp : kp1){
-        if (kp.response < 10) kp1_r[0].push_back(kp);
+        if (kp.response < 15) kp1_r[0].push_back(kp);
         else if (kp.response < 20) kp1_r[1].push_back(kp);
-        else if (kp.response < 30) kp1_r[2].push_back(kp);
-        else if (kp.response < 40) kp1_r[3].push_back(kp);
+        else if (kp.response < 25) kp1_r[2].push_back(kp);
+        else if (kp.response < 30) kp1_r[3].push_back(kp);
+        else if (kp.response < 35) kp1_r[4].push_back(kp);
+        else if (kp.response < 40) kp1_r[5].push_back(kp);
     }
     for (auto& kp : kp2){
-        if (kp.response <10) kp2_r[0].push_back(kp);
+        if (kp.response < 15) kp2_r[0].push_back(kp);
         else if (kp.response < 20) kp2_r[1].push_back(kp);
-        else if (kp.response < 30) kp2_r[2].push_back(kp);
-        else if (kp.response < 40) kp2_r[3].push_back(kp);
+        else if (kp.response < 25) kp2_r[2].push_back(kp);
+        else if (kp.response < 30) kp2_r[3].push_back(kp);
+        else if (kp.response < 35) kp2_r[4].push_back(kp);
+        else if (kp.response < 40) kp2_r[5].push_back(kp);
     }
 
     cv::Ptr<cv::Feature2D> feature = cv::ORB::create();
@@ -310,10 +314,17 @@ void response_matching_quality(int thresh, cv::Mat img1, cv::Mat img2){
         feature->compute(img2_gray, kp2_r[i], desc2);
         matcher->match(desc1, desc2, matches);
 
-        matches_10p = std::vector<cv::DMatch>(matches.begin(), matches.begin() + (int)(0.1 * matches.size()));
+        std::vector<int> random_idxes = random_idx((int)(0.1 * matches.size()), matches.size());
+        for (int i = 0; i < random_idxes.size(); ++i){
+            matches_10p.push_back(matches[random_idxes[i]]);
+        }
+        random_idxes.clear();
 
         if (matches.size() > 20){
-            matches_20 = std::vector<cv::DMatch>(matches.begin(), matches.begin() + 20);
+            random_idxes = random_idx(20, matches.size());
+            for (int i = 0; i < random_idxes.size(); ++i){
+                matches_20.push_back(matches[random_idxes[i]]);
+            }
         }
         else{
             matches_20 = std::vector<cv::DMatch>(matches.begin(), matches.end());
@@ -327,12 +338,37 @@ void response_matching_quality(int thresh, cv::Mat img1, cv::Mat img2){
         int NofGM_over_NofAM = std::round((double)temp_good_match/matches.size() * 100);
         if (temp_good_match == 0) NofGM_over_NofAM = 0;
 
-        std::cout << "response < " << std::to_string(i*10+10) << " matching accuracy: " << NofGM_over_NofAM  << " %" << std::endl;
+        std::cout << "response " << std::to_string(i*5+10) << "_" << std::to_string(i*5 + 15) << " matching accuracy: " << NofGM_over_NofAM  << " %" << std::endl;
         cv::drawMatches(img1, kp1_r[i], img2, kp2_r[i], matches_20, img_drawn1, cv::Scalar_<double>::all(-1),cv::Scalar_<double>::all(-1), std::vector< char >(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
         cv::drawMatches(img1, kp1_r[i], img2, kp2_r[i], matches_10p, img_drawn2, cv::Scalar_<double>::all(-1),cv::Scalar_<double>::all(-1), std::vector< char >(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
-        std::string name1 = std::string("../match_imgs_response/response_under_") += std::to_string(i*10+10) += std::string("_20pts.png");
-        std::string name2 = std::string("../match_imgs_response/response_under_") += std::to_string(i*10+10) += std::string("_10percent.png");
+        std::string name1 = std::string("../match_imgs_response/response_between_") += std::to_string(i*5+10) += std::string("_") += std::to_string(i*5+15) += std::string("_20pts.png");
+        std::string name2 = std::string("../match_imgs_response/response_between_") += std::to_string(i*5+10) += std::string("_") += std::to_string(i*5+15) += std::string("_10percent.png");
         cv::imwrite(name1, img_drawn1);
         cv::imwrite(name2, img_drawn2);
     }
+}
+
+std::vector<int> random_idx(int size, int total_size){
+    std::vector<int> random_idxes;
+    random_idxes.reserve(size);
+
+    int count = 0;
+    while (count < size){
+        int isSame = 0;
+        int tmp = std::rand() % total_size;
+
+        for (int i = 0; i < count; ++i){
+            if (random_idxes[i] == tmp){
+                isSame = 1;
+                break;
+            }
+        }
+
+        if (isSame == 0){
+            random_idxes.push_back(tmp);
+            ++count;
+        }
+
+    }
+    return random_idxes;
 }
